@@ -1,0 +1,27 @@
+Package: forvoztools
+Type: Package
+Title: Forensic Voice Tools
+Version: 1.0.0
+Authors@R: person("Tu", "Nombre", email = "tu.email@ejemplo.com", role = c("aut", "cre"))
+Description: A comprehensive collection of functions for forensic voice analysis, specifically designed for calculating and visualizing Log-Likelihood Ratios (LLR). Includes tools for density plots, violin plots, Tippett plots, calibration, fusion, intersection analysis, and export of results to Excel.
+Depends: R (>= 3.5.0)
+Imports: 
+    pracma,
+    gridExtra,
+    readxl,
+    dplyr,
+    stringr,
+    haven,
+    ggplot2,
+    writexl,
+    patchwork,
+    ROCR,
+    tidyr,
+    openxlsx,
+    ggrepel,
+    rlang,
+    purrr
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.3
