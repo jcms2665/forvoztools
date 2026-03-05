@@ -12,27 +12,37 @@
 #' # Asume que existe un data frame 'todo_balanceado' en el entorno global
 #' generar_graficos_tippett("llr_40")
 #' }
-generar_graficos_tippett <- function(llr_var) {
+generar_graficos_tippett <- function(data, llr_var) {
   # Verificar que el paquete gridExtra está instalado
   if (!requireNamespace("gridExtra", quietly = TRUE)) {
     stop("El paquete 'gridExtra' es necesario para esta función. Por favor instálalo con install.packages('gridExtra')")
   }
-  
+
+  # Validaciones mínimas
+  if (!all(c("diferencia", "misma_persona") %in% names(data))) {
+    stop("La base debe incluir las columnas: 'diferencia' y 'misma_persona'.")
+  }
+  if (!llr_var %in% names(data)) {
+    stop(paste0("No encontré la variable '", llr_var, "' en la base."))
+  }
+
   plots <- list()
-  
-  for (i in 0:3) {
-    df_filtrado <- todo_balanceado %>% filter(diferencia == i)
+
+  for (i in 0:4) {
+    df_filtrado <- data %>% dplyr::filter(diferencia == i)
     titulo <- paste0("diferencia = ", i)
+
     p <- T_ajustada(df_filtrado, llr_var, "misma_persona", title = titulo, c(-5, 5))
+
     if (i < 4) {
-      p <- p + theme(legend.position = "none")
+      p <- p + ggplot2::theme(legend.position = "none")
     }
     plots[[i + 1]] <- p
   }
-  
+
   # Agregar etiqueta en la posición 6
   plots[[6]] <- grid::textGrob("#")
-  
+
   # Mostrar las gráficas (5 gráficos + etiqueta)
   gridExtra::grid.arrange(
     grobs = plots,
