@@ -15,16 +15,16 @@
 #'
 #' @return A ggplot object.
 #'
-#' @import ggplot2
+#' @importFrom ggplot2 ggplot aes geom_line geom_vline annotate scale_color_manual scale_y_continuous labs theme_bw theme element_line element_rect element_text arrow unit
 #' @export
-plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL, 
+plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
                                titulo = "Gráfico de entropía cruzada (ECE)", ...) {
-  
+
   # Check if ggplot2 is available
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package 'ggplot2' is required for plotting. Please install it.")
   }
-  
+
   #--------------------------------------------------
   # 1. Extract data
   #--------------------------------------------------
@@ -32,18 +32,18 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
   ece_orig_vals <- x$ece
   ece_cal_vals  <- x$ece.cal
   ece_ref_vals  <- x$ece.null
-  
+
   prior_log_odds <- log10(prior_vals / (1 - prior_vals))
-  
+
   #--------------------------------------------------
   # 2. Calculate Cllr and Cllr_min
   #--------------------------------------------------
   idx_cero <- which.min(abs(prior_vals - 0.5))
-  
+
   if (is.null(cllr)) {
     cllr <- ece_orig_vals[idx_cero]
   }
-  
+
   if (is.null(cllr_min)) {
     cllr_min <- if (!is.null(ece_cal_vals) && !all(is.na(ece_cal_vals))) {
       ece_cal_vals[idx_cero]
@@ -51,7 +51,7 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
       NA_real_
     }
   }
-  
+
   #--------------------------------------------------
   # 3. Data frame
   #--------------------------------------------------
@@ -61,31 +61,31 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
     ece_cal  = ece_cal_vals,
     ece_ref  = ece_ref_vals
   )
-  
+
   #--------------------------------------------------
   # 4. Limits
   #--------------------------------------------------
   y_max <- max(c(df_ece$ece_orig, df_ece$ece_cal, df_ece$ece_ref), na.rm = TRUE)
   y_lim <- max(1, ceiling(y_max * 10) / 10)
-  
+
   #--------------------------------------------------
   # 5. Base plot
   #--------------------------------------------------
   p <- ggplot2::ggplot(df_ece, ggplot2::aes(x = prior_log_odds)) +
-    
+
     # Curves
     ggplot2::geom_line(ggplot2::aes(y = ece_orig, color = "LR original"),
                        linewidth = 1.2) +
-    
+
     ggplot2::geom_line(ggplot2::aes(y = ece_cal, color = "LR calibrado"),
                        linewidth = 1.2, linetype = "dashed", na.rm = TRUE) +
-    
+
     ggplot2::geom_line(ggplot2::aes(y = ece_ref, color = "Referencia"),
                        linewidth = 0.9, linetype = "dotted") +
-    
+
     # Vertical line at 0
     ggplot2::geom_vline(xintercept = 0, linetype = "dotdash", color = "black") +
-    
+
     #--------------------------------------------------
   # 6. Cllr labels with arrows
   #--------------------------------------------------
@@ -97,7 +97,7 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
                     hjust = 0,
                     size = 3.5,
                     color = "gray30") +
-    
+
     # Arrow from Cllr label
     ggplot2::annotate("segment",
                       x = min(df_ece$prior_log_odds) * 0.5,
@@ -107,7 +107,7 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
                       arrow = ggplot2::arrow(length = ggplot2::unit(0.1, "cm"), type = "closed"),
                       color = "#7F9297",
                       linewidth = 0.4) +
-    
+
     # Cllr[min] label
     ggplot2::annotate("text",
                       x = min(df_ece$prior_log_odds) * 0.95,
@@ -116,7 +116,7 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
                       hjust = 0,
                       size = 3.5,
                       color = "gray30") +
-    
+
     # Arrow from Cllr[min] label
     ggplot2::annotate("segment",
                       x = min(df_ece$prior_log_odds) * 0.95 + 0.75,
@@ -126,7 +126,7 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
                       arrow = ggplot2::arrow(length = ggplot2::unit(0.1, "cm"), type = "closed"),
                       color = "#7F9297",
                       linewidth = 0.4) +
-    
+
     #--------------------------------------------------
   # 7. Scales
   #--------------------------------------------------
@@ -137,19 +137,19 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
       "Referencia"   = "#7F9297"
     )
   ) +
-    
+
     ggplot2::scale_y_continuous(
       limits = c(0, y_lim),
       breaks = seq(0, y_lim, 0.1)
     ) +
-    
+
     ggplot2::labs(
       title = titulo,
       x = expression("Prior log"[10]*"(odds)"),
       y = "Empirical cross-entropy",
       color = NULL
     ) +
-    
+
     ggplot2::theme_bw(base_size = 11) +
     ggplot2::theme(
       panel.grid.major = ggplot2::element_line(color = "gray80", linetype = "dotted"),
@@ -158,7 +158,7 @@ plot_ece_funcional <- function(x, cllr = NULL, cllr_min = NULL,
       legend.background = ggplot2::element_rect(fill = "white", color = "black"),
       plot.title = ggplot2::element_text(hjust = 0.5, face = "bold")
     )
-  
+
   return(p)
 }
 
